@@ -179,8 +179,7 @@ class MajorityVoteClassifier(BaseEstimator,
     def __init__(self, classifiers, vote='classlabel', weights=None):
 
         self.classifiers = classifiers
-        self.named_classifiers = {key: value for key, value
-                                  in _name_estimators(classifiers)}
+        self.named_classifiers = dict(_name_estimators(classifiers))
         self.vote = vote
         self.weights = weights
 
@@ -269,19 +268,17 @@ class MajorityVoteClassifier(BaseEstimator,
         """
         probas = np.asarray([clf.predict_proba(X)
                              for clf in self.classifiers_])
-        avg_proba = np.average(probas, axis=0, weights=self.weights)
-        return avg_proba
+        return np.average(probas, axis=0, weights=self.weights)
 
     def get_params(self, deep=True):
         """ Get classifier parameter names for GridSearch"""
         if not deep:
             return super(MajorityVoteClassifier, self).get_params(deep=False)
-        else:
-            out = self.named_classifiers.copy()
-            for name, step in six.iteritems(self.named_classifiers):
-                for key, value in six.iteritems(step.get_params(deep=True)):
-                    out['%s__%s' % (name, key)] = value
-            return out
+        out = self.named_classifiers.copy()
+        for name, step in six.iteritems(self.named_classifiers):
+            for key, value in six.iteritems(step.get_params(deep=True)):
+                out[f'{name}__{key}'] = value
+        return out
 
 
 
@@ -419,24 +416,24 @@ f, axarr = plt.subplots(nrows=2, ncols=2,
 for idx, clf, tt in zip(product([0, 1], [0, 1]),
                         all_clf, clf_labels):
     clf.fit(X_train_std, y_train)
-    
+
     Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
     Z = Z.reshape(xx.shape)
 
     axarr[idx[0], idx[1]].contourf(xx, yy, Z, alpha=0.3)
-    
+
     axarr[idx[0], idx[1]].scatter(X_train_std[y_train==0, 0], 
                                   X_train_std[y_train==0, 1], 
                                   c='blue', 
                                   marker='^',
                                   s=50)
-    
+
     axarr[idx[0], idx[1]].scatter(X_train_std[y_train==1, 0], 
                                   X_train_std[y_train==1, 1], 
                                   c='green', 
                                   marker='o',
                                   s=50)
-    
+
     axarr[idx[0], idx[1]].set_title(tt)
 
 plt.text(-3.5, -5., 
@@ -477,7 +474,7 @@ for r, _ in enumerate(grid.cv_results_['mean_test_score']):
 
 
 
-print('Best parameters: %s' % grid.best_params_)
+print(f'Best parameters: {grid.best_params_}')
 print('Accuracy: %.2f' % grid.best_score_)
 
 
@@ -600,8 +597,8 @@ bag = bag.fit(X_train, y_train)
 y_train_pred = bag.predict(X_train)
 y_test_pred = bag.predict(X_test)
 
-bag_train = accuracy_score(y_train, y_train_pred) 
-bag_test = accuracy_score(y_test, y_test_pred) 
+bag_train = accuracy_score(y_train, y_train_pred)
+bag_test = accuracy_score(y_test, y_test_pred)
 print('Bagging train/test accuracies %.3f/%.3f'
       % (bag_train, bag_test))
 
@@ -695,8 +692,8 @@ ada = ada.fit(X_train, y_train)
 y_train_pred = ada.predict(X_train)
 y_test_pred = ada.predict(X_test)
 
-ada_train = accuracy_score(y_train, y_train_pred) 
-ada_test = accuracy_score(y_test, y_test_pred) 
+ada_train = accuracy_score(y_train, y_train_pred)
+ada_test = accuracy_score(y_test, y_test_pred)
 print('AdaBoost train/test accuracies %.3f/%.3f'
       % (ada_train, ada_test))
 

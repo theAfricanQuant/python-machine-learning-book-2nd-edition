@@ -38,10 +38,9 @@ def cleanup(path):
                 if 'from __future__ import print_function' in line:
                     if line != imports[0]:
                         imports.insert(0, line)
-                else:
-                    if line.strip() not in existing_imports:
-                        imports.append(line)
-                        existing_imports.add(line.strip())
+                elif line.strip() not in existing_imports:
+                    imports.append(line)
+                    existing_imports.add(line.strip())
             else:
                 clean_content.append(line)
 

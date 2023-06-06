@@ -161,7 +161,7 @@ print('Test Accuracy: %.3f' % pipe_lr.score(X_test, y_test))
 
 
 
-    
+
 
 kfold = StratifiedKFold(n_splits=10,
                         random_state=1).split(X_train, y_train)
@@ -173,7 +173,7 @@ for k, (train, test) in enumerate(kfold):
     scores.append(score)
     print('Fold: %2d, Class dist.: %s, Acc: %.3f' % (k+1,
           np.bincount(y_train[train]), score))
-    
+
 print('\nCV accuracy: %.3f +/- %.3f' % (np.mean(scores), np.std(scores)))
 
 
@@ -185,7 +185,7 @@ scores = cross_val_score(estimator=pipe_lr,
                          y=y_train,
                          cv=10,
                          n_jobs=1)
-print('CV accuracy scores: %s' % scores)
+print(f'CV accuracy scores: {scores}')
 print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores), np.std(scores)))
 
 
@@ -486,7 +486,7 @@ pipe_lr = make_pipeline(StandardScaler(),
                                            C=100.0))
 
 X_train2 = X_train[:, [4, 14]]
-    
+
 
 cv = list(StratifiedKFold(n_splits=3, 
                           random_state=1).split(X_train, y_train))

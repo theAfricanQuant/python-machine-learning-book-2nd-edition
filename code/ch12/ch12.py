@@ -102,11 +102,7 @@ import matplotlib.pyplot as plt
 # this code cell unzips mnist
 
 
-if (sys.version_info > (3, 0)):
-    writemode = 'wb'
-else:
-    writemode = 'w'
-
+writemode = 'wb' if (sys.version_info > (3, 0)) else 'w'
 zipped_mnist = [f for f in os.listdir('./') if f.endswith('ubyte.gz')]
 for z in zipped_mnist:
     with gzip.GzipFile(z, mode='rb') as decompressed, open(z[:-3], writemode) as outfile:
@@ -139,11 +135,9 @@ for z in zipped_mnist:
  
 def load_mnist(path, kind='train'):
     """Load MNIST data from `path`"""
-    labels_path = os.path.join(path, 
-                               '%s-labels-idx1-ubyte' % kind)
-    images_path = os.path.join(path, 
-                               '%s-images-idx3-ubyte' % kind)
-        
+    labels_path = os.path.join(path, f'{kind}-labels-idx1-ubyte')
+    images_path = os.path.join(path, f'{kind}-images-idx3-ubyte')
+
     with open(labels_path, 'rb') as lbpath:
         magic, n = struct.unpack('>II', 
                                  lbpath.read(8))
@@ -156,7 +150,7 @@ def load_mnist(path, kind='train'):
         images = np.fromfile(imgpath, 
                              dtype=np.uint8).reshape(len(labels), 784)
         images = ((images / 255.) - .5) * 2
- 
+
     return images, labels
 
 
@@ -350,23 +344,7 @@ class NeuralNetMLP(object):
 
         term1 = -y_enc * (np.log(output))
         term2 = (1. - y_enc) * np.log(1. - output)
-        cost = np.sum(term1 - term2) + L2_term
-        
-        # If you are applying this cost function to other
-        # datasets where activation
-        # values maybe become more extreme (closer to zero or 1)
-        # you may encounter "ZeroDivisionError"s due to numerical
-        # instabilities in Python & NumPy for the current implementation.
-        # I.e., the code tries to evaluate log(0), which is undefined.
-        # To address this issue, you could add a small constant to the
-        # activation values that are passed to the log function.
-        #
-        # For example:
-        #
-        # term1 = -y_enc * (np.log(output + 1e-5))
-        # term2 = (1. - y_enc) * np.log(1. - output + 1e-5)
-        
-        return cost
+        return np.sum(term1 - term2) + L2_term
 
     def predict(self, X):
         """Predict class labels
@@ -383,8 +361,7 @@ class NeuralNetMLP(object):
 
         """
         z_h, a_h, z_out, a_out = self._forward(X)
-        y_pred = np.argmax(z_out, axis=1)
-        return y_pred
+        return np.argmax(z_out, axis=1)
 
     def fit(self, X_train, y_train, X_valid, y_valid):
         """ Learn weights from training data.
@@ -512,21 +489,7 @@ class NeuralNetMLP(object):
 
 
 
-n_epochs = 200
-
-## @Readers: PLEASE IGNORE IF-STATEMENT BELOW
-##
-## This cell is meant to run fewer epochs when
-## the notebook is run on the Travis Continuous Integration
-## platform to test the code on a smaller dataset
-## to prevent timeout errors; it just serves a debugging tool
-
-if 'TRAVIS' in os.environ:
-    n_epochs = 20
-
-
-
-
+n_epochs = 20 if 'TRAVIS' in os.environ else 200
 nn = NeuralNetMLP(n_hidden=100, 
                   l2=0.01, 
                   epochs=n_epochs, 

@@ -188,7 +188,7 @@ for i, c in enumerate(cluster_labels):
 
     yticks.append((y_ax_lower + y_ax_upper) / 2.)
     y_ax_lower += len(c_silhouette_vals)
-    
+
 silhouette_avg = np.mean(silhouette_vals)
 plt.axvline(silhouette_avg, color="red", linestyle="--") 
 
@@ -254,7 +254,7 @@ for i, c in enumerate(cluster_labels):
 
     yticks.append((y_ax_lower + y_ax_upper) / 2.)
     y_ax_lower += len(c_silhouette_vals)
-    
+
 silhouette_avg = np.mean(silhouette_vals)
 plt.axvline(silhouette_avg, color="red", linestyle="--") 
 
@@ -401,7 +401,7 @@ ac = AgglomerativeClustering(n_clusters=3,
                              affinity='euclidean', 
                              linkage='complete')
 labels = ac.fit_predict(X)
-print('Cluster labels: %s' % labels)
+print(f'Cluster labels: {labels}')
 
 
 
@@ -410,7 +410,7 @@ ac = AgglomerativeClustering(n_clusters=2,
                              affinity='euclidean', 
                              linkage='complete')
 labels = ac.fit_predict(X)
-print('Cluster labels: %s' % labels)
+print(f'Cluster labels: {labels}')
 
 
 

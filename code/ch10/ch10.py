@@ -198,7 +198,7 @@ class LinearRegressionGD(object):
         self.w_ = np.zeros(1 + X.shape[1])
         self.cost_ = []
 
-        for i in range(self.n_iter):
+        for _ in range(self.n_iter):
             output = self.net_input(X)
             errors = (y - output)
             self.w_[1:] += self.eta * X.T.dot(errors)

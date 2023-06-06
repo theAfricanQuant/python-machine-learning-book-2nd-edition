@@ -415,15 +415,14 @@ for label, mv in zip(range(1, 4), mean_vecs):
         class_scatter += (row - mv).dot((row - mv).T)
     S_W += class_scatter                          # sum class scatter matrices
 
-print('Within-class scatter matrix: %sx%s' % (S_W.shape[0], S_W.shape[1]))
+print(f'Within-class scatter matrix: {S_W.shape[0]}x{S_W.shape[1]}')
 
 
 # Better: covariance matrix since classes are not equally distributed:
 
 
 
-print('Class label distribution: %s' 
-      % np.bincount(y_train)[1:])
+print(f'Class label distribution: {np.bincount(y_train)[1:]}')
 
 
 
@@ -433,8 +432,7 @@ S_W = np.zeros((d, d))
 for label, mv in zip(range(1, 4), mean_vecs):
     class_scatter = np.cov(X_train_std[y_train == label].T)
     S_W += class_scatter
-print('Scaled within-class scatter matrix: %sx%s' % (S_W.shape[0],
-                                                     S_W.shape[1]))
+print(f'Scaled within-class scatter matrix: {S_W.shape[0]}x{S_W.shape[1]}')
 
 
 # Compute the between-class scatter matrix:
@@ -450,7 +448,7 @@ for i, mean_vec in enumerate(mean_vecs):
     mean_overall = mean_overall.reshape(d, 1)  # make column vector
     S_B += n * (mean_vec - mean_overall).dot((mean_vec - mean_overall).T)
 
-print('Between-class scatter matrix: %sx%s' % (S_B.shape[0], S_B.shape[1]))
+print(f'Between-class scatter matrix: {S_B.shape[0]}x{S_B.shape[1]}')
 
 
 
@@ -626,11 +624,7 @@ def rbf_kernel_pca(X, gamma, n_components):
     eigvals, eigvecs = eigh(K)
     eigvals, eigvecs = eigvals[::-1], eigvecs[:, ::-1]
 
-    # Collect the top k eigenvectors (projected samples)
-    X_pc = np.column_stack((eigvecs[:, i]
-                            for i in range(n_components)))
-
-    return X_pc
+    return np.column_stack((eigvecs[:, i] for i in range(n_components)))
 
 
 

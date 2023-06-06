@@ -100,9 +100,10 @@ def conv1d(x, w, p=0, s=1):
     if p > 0:
         zero_pad = np.zeros(shape=p)
         x_padded = np.concatenate([zero_pad, x_padded, zero_pad])
-    res = []
-    for i in range(0, int(len(x)/s),s):
-        res.append(np.sum(x_padded[i:i+w_rot.shape[0]] * w_rot))
+    res = [
+        np.sum(x_padded[i : i + w_rot.shape[0]] * w_rot)
+        for i in range(0, int(len(x) / s), s)
+    ]
     return np.array(res)
 
 ## Testing:
@@ -188,8 +189,8 @@ except AttributeError:
          " You can satisfy this requirement by installing the"
          " userfriendly fork PILLOW via `pip install pillow`.")
     raise AttributeError(s)
-    
-    
+
+
 print('Image shape:', img.shape)
 print('Number of channels:', img.shape[2])
 print('Image data type:', img.dtype)
@@ -234,11 +235,7 @@ import shutil
 import os
 
 
-if (sys.version_info > (3, 0)):
-    writemode = 'wb'
-else:
-    writemode = 'w'
-
+writemode = 'wb' if (sys.version_info > (3, 0)) else 'w'
 zipped_mnist = [f for f in os.listdir('./')
                 if f.endswith('ubyte.gz')]
 for z in zipped_mnist:
@@ -255,12 +252,8 @@ import numpy as np
 
 def load_mnist(path, kind='train'):
     """Load MNIST data from `path`"""
-    labels_path = os.path.join(path,
-                               '%s-labels-idx1-ubyte'
-                                % kind)
-    images_path = os.path.join(path,
-                               '%s-images-idx3-ubyte'
-                               % kind)
+    labels_path = os.path.join(path, f'{kind}-labels-idx1-ubyte')
+    images_path = os.path.join(path, f'{kind}-images-idx3-ubyte')
 
     with open(labels_path, 'rb') as lbpath:
         magic, n = struct.unpack('>II',
@@ -512,13 +505,13 @@ def build_cnn(learning_rate=1e-4):
 def save(saver, sess, epoch, path='./model/'):
     if not os.path.isdir(path):
         os.makedirs(path)
-    print('Saving model in %s' % path)
+    print(f'Saving model in {path}')
     saver.save(sess, os.path.join(path,'cnn-model.ckpt'),
                global_step=epoch)
 
     
 def load(saver, sess, path, epoch):
-    print('Loading model from %s' % path)
+    print(f'Loading model from {path}')
     saver.restore(sess, os.path.join(
             path, 'cnn-model.ckpt-%d' % epoch))
 
@@ -921,13 +914,13 @@ class ConvNN(object):
     def save(self, epoch, path='./tflayers-model/'):
         if not os.path.isdir(path):
             os.makedirs(path)
-        print('Saving model in %s' % path)
+        print(f'Saving model in {path}')
         self.saver.save(self.sess, 
                         os.path.join(path, 'model.ckpt'),
                         global_step=epoch)
         
     def load(self, epoch, path):
-        print('Loading model from %s' % path)
+        print(f'Loading model from {path}')
         self.saver.restore(self.sess, 
              os.path.join(path, 'model.ckpt-%d' % epoch))
         
@@ -946,7 +939,7 @@ class ConvNN(object):
             batch_gen =                 batch_generator(X_data, y_data, 
                                  shuffle=self.shuffle)
             avg_loss = 0.0
-            for i, (batch_x,batch_y) in                 enumerate(batch_gen):
+            for batch_x, batch_y in batch_gen:
                 feed = {'tf_x:0': batch_x, 
                         'tf_y:0': batch_y,
                         'is_train:0': True} ## for dropout
@@ -954,7 +947,7 @@ class ConvNN(object):
                         ['cross_entropy_loss:0', 'train_op'], 
                         feed_dict=feed)
                 avg_loss += loss
-                
+
             print('Epoch %02d: Training Avg. Loss: '
                   '%7.3f' % (epoch, avg_loss), end=' ')
             if validation_set is not None:

@@ -166,7 +166,7 @@ for i,review in enumerate(df['review']):
     text = ''.join([c if c not in punctuation else ' '+c+' '                     for c in review]).lower()
     df.loc[i,'review'] = text
     pbar.update()
-    counts.update(text.split())
+    counts |= text.split()
 
 
 
@@ -291,10 +291,14 @@ class SentimentRNN(object):
 
         ## Define LSTM cell and stack them together
         cells = tf.contrib.rnn.MultiRNNCell(
-                [tf.contrib.rnn.DropoutWrapper(
-                   tf.contrib.rnn.BasicLSTMCell(self.lstm_size),
-                   output_keep_prob=tf_keepprob)
-                 for i in range(self.num_layers)])
+            [
+                tf.contrib.rnn.DropoutWrapper(
+                    tf.contrib.rnn.BasicLSTMCell(self.lstm_size),
+                    output_keep_prob=tf_keepprob,
+                )
+                for _ in range(self.num_layers)
+            ]
+        )
 
         ## Define the initial state:
         self.initial_state = cells.zero_state(
@@ -314,10 +318,10 @@ class SentimentRNN(object):
                  inputs=lstm_outputs[:, -1],
                  units=1, activation=None,
                  name='logits')
-        
+
         logits = tf.squeeze(logits, name='logits_squeezed')
         print ('\n  << logits        >> ', logits)
-        
+
         y_proba = tf.nn.sigmoid(logits, name='probabilities')
         predictions = {
             'probabilities': y_proba,
@@ -331,7 +335,7 @@ class SentimentRNN(object):
                  tf.nn.sigmoid_cross_entropy_with_logits(
                  labels=tf_y, logits=logits),
                  name='cost')
-        
+
         ## Define the optimizer
         optimizer = tf.train.AdamOptimizer(self.learning_rate)
         train_op = optimizer.minimize(cost, name='train_op')
@@ -498,10 +502,10 @@ def reshape_data(sequence, batch_size, num_steps):
     mini_batch_length = batch_size * num_steps
     num_batches = int(len(sequence) / mini_batch_length)
     if num_batches*mini_batch_length + 1 > len(sequence):
-        num_batches = num_batches - 1
+        num_batches -= 1
     ## Truncate the sequence at the end to get rid of 
     ## remaining charcaters that do not make a full batch
-    x = sequence[0 : num_batches*mini_batch_length]
+    x = sequence[:num_batches*mini_batch_length]
     y = sequence[1 : num_batches*mini_batch_length + 1]
     ## Split x & y into a list batches of sequences: 
     x_batch_splits = np.split(x, batch_size)
@@ -510,7 +514,7 @@ def reshape_data(sequence, batch_size, num_steps):
     ## batch_size x mini_batch_length
     x = np.stack(x_batch_splits)
     y = np.stack(y_batch_splits)
-    
+
     return x, y
 
 ## Testing:
@@ -647,23 +651,23 @@ class CharRNN(object):
         ## if does not exists
         if not os.path.exists(ckpt_dir):
             os.mkdir(ckpt_dir)
-            
+
         with tf.Session(graph=self.g) as sess:
             sess.run(self.init_op)
 
             n_batches = int(train_x.shape[1]/self.num_steps)
             iterations = n_batches * num_epochs
+            loss = 0
             for epoch in range(num_epochs):
 
                 # Train network
                 new_state = sess.run(self.initial_state)
-                loss = 0
                 ## Minibatch generator:
                 bgen = create_batch_generator(
                         train_x, train_y, self.num_steps)
                 for b, (batch_x, batch_y) in enumerate(bgen, 1):
                     iteration = epoch*n_batches + b
-                    
+
                     feed = {'tf_x:0': batch_x,
                             'tf_y:0': batch_y,
                             'tf_keepprob:0': self.keep_prob,
@@ -687,7 +691,7 @@ class CharRNN(object):
                 
     def sample(self, output_length, 
                ckpt_dir, starter_seq="The "):
-        observed_seq = [ch for ch in starter_seq]        
+        observed_seq = list(starter_seq)
         with tf.Session(graph=self.g) as sess:
             self.saver.restore(
                 sess, 
@@ -706,9 +710,9 @@ class CharRNN(object):
 
             ch_id = get_top_char(proba, len(chars))
             observed_seq.append(int2char[ch_id])
-            
+
             ## 2: run the model using the updated observed_seq
-            for i in range(output_length):
+            for _ in range(output_length):
                 x[0,0] = ch_id
                 feed = {'tf_x:0': x,
                         'tf_keepprob:0': 1.0,
@@ -729,8 +733,7 @@ def get_top_char(probas, char_size, top_n=5):
     p = np.squeeze(probas)
     p[np.argsort(p)[:-top_n]] = 0.0
     p = p / np.sum(p)
-    ch_id = np.random.choice(char_size, 1, p=p)[0]
-    return ch_id
+    return np.random.choice(char_size, 1, p=p)[0]
 
 
 

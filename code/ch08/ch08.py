@@ -476,7 +476,7 @@ gs_lr_tfidf.fit(X_train, y_train)
 
 
 
-print('Best parameter set: %s ' % gs_lr_tfidf.best_params_)
+print(f'Best parameter set: {gs_lr_tfidf.best_params_} ')
 print('CV Accuracy: %.3f' % gs_lr_tfidf.best_score_)
 
 
@@ -497,11 +497,11 @@ print('Test Accuracy: %.3f' % clf.score(X_test, y_test))
 
 np.random.seed(0)
 np.set_printoptions(precision=6)
-y = [np.random.randint(3) for i in range(25)]
+y = [np.random.randint(3) for _ in range(25)]
 X = (y + np.random.randn(25)).reshape(-1, 1)
 
 cv5_idx = list(StratifiedKFold(n_splits=5, shuffle=False, random_state=0).split(X, y))
-    
+
 cross_val_score(LogisticRegression(random_state=123), X, y, cv=cv5_idx)
 
 
@@ -544,8 +544,7 @@ def tokenizer(text):
     text = re.sub('<[^>]*>', '', text)
     emoticons = re.findall('(?::|;|=)(?:-)?(?:\)|\(|D|P)', text.lower())
     text = re.sub('[\W]+', ' ', text.lower()) +        ' '.join(emoticons).replace('-', '')
-    tokenized = [w for w in text.split() if w not in stop]
-    return tokenized
+    return [w for w in text.split() if w not in stop]
 
 
 def stream_docs(path):

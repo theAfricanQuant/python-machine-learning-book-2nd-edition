@@ -15,8 +15,7 @@ def tokenizer(text):
                            text.lower())
     text = re.sub('[\W]+', ' ', text.lower()) \
                    + ' '.join(emoticons).replace('-', '')
-    tokenized = [w for w in text.split() if w not in stop]
-    return tokenized
+    return [w for w in text.split() if w not in stop]
 
 vect = HashingVectorizer(decode_error='ignore',
                          n_features=2**21,

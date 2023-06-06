@@ -203,14 +203,14 @@ lrmodel = TfLinreg(x_dim=X_train.shape[1], learning_rate=0.01)
 def train_linreg(sess, model, X_train, y_train, num_epochs=10):
     ## initialiaze all variables: W & b
     sess.run(model.init_op)
-    
+
     training_costs = []
-    for i in range(num_epochs):
+    for _ in range(num_epochs):
         _, cost = sess.run([model.optimizer, model.mean_cost], 
                            feed_dict={model.X:X_train, 
                                       model.y:y_train})
         training_costs.append(cost)
-        
+
     return training_costs
 
 
@@ -234,9 +234,7 @@ plt.show()
 
 
 def predict_linreg(sess, model, X_test):
-    y_pred = sess.run(model.z_net, 
-                      feed_dict={model.X:X_test})
-    return y_pred
+    return sess.run(model.z_net, feed_dict={model.X: X_test})
 
 
 
@@ -268,11 +266,7 @@ plt.show()
 # unzips mnist
 
 
-if (sys.version_info > (3, 0)):
-    writemode = 'wb'
-else:
-    writemode = 'w'
-
+writemode = 'wb' if (sys.version_info > (3, 0)) else 'w'
 zipped_mnist = [f for f in os.listdir('./') if f.endswith('ubyte.gz')]
 for z in zipped_mnist:
     with gzip.GzipFile(z, mode='rb') as decompressed, open(z[:-3], writemode) as outfile:
@@ -284,11 +278,9 @@ for z in zipped_mnist:
  
 def load_mnist(path, kind='train'):
     """Load MNIST data from `path`"""
-    labels_path = os.path.join(path, 
-                               '%s-labels-idx1-ubyte' % kind)
-    images_path = os.path.join(path, 
-                               '%s-images-idx3-ubyte' % kind)
-        
+    labels_path = os.path.join(path, f'{kind}-labels-idx1-ubyte')
+    images_path = os.path.join(path, f'{kind}-images-idx3-ubyte')
+
     with open(labels_path, 'rb') as lbpath:
         magic, n = struct.unpack('>II', 
                                  lbpath.read(8))
@@ -301,7 +293,7 @@ def load_mnist(path, kind='train'):
         images = np.fromfile(imgpath, 
                              dtype=np.uint8).reshape(len(labels), 784)
         images = ((images / 255.) - .5) * 2
- 
+
     return images, labels
 
 

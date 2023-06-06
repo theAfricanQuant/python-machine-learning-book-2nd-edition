@@ -16,8 +16,7 @@ def update_model(db_path, model, batch_size=10000):
     c = conn.cursor()
     c.execute('SELECT * from review_db')
 
-    results = c.fetchmany(batch_size)
-    while results:
+    while results := c.fetchmany(batch_size):
         data = np.array(results)
         X = data[:, 0]
         y = data[:, 1].astype(int)
@@ -25,8 +24,6 @@ def update_model(db_path, model, batch_size=10000):
         classes = np.array([0, 1])
         X_train = vect.transform(X)
         model.partial_fit(X_train, y, classes=classes)
-        results = c.fetchmany(batch_size)
-
     conn.close()
     return model
 

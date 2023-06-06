@@ -491,7 +491,7 @@ training_costs = []
 with tf.Session(graph=g) as sess:
     ## first, run the variables initializer
     sess.run(tf.global_variables_initializer())
-    
+
     ## train the model for n_epochs
     for e in range(n_epochs):
         c, _ = sess.run([cost, train_op], 
@@ -500,7 +500,7 @@ with tf.Session(graph=g) as sess:
         training_costs.append(c)
         if not e % 50:
             print('Epoch %4d: %.4f' % (e, c))
-            
+
 
 plt.plot(training_costs)
 # plt.savefig('images/14_04.png', dpi=300)
@@ -524,7 +524,7 @@ training_costs = []
 with tf.Session(graph=g) as sess:
     ## first, run the variables initializer
     sess.run(tf.global_variables_initializer())
-    
+
     ## train the model for n_eopchs
     for e in range(n_epochs):
         c, _ = sess.run(['cost:0', 'train_op'], 
@@ -542,7 +542,7 @@ with tf.Session(graph=g) as sess:
 ## add saver to the graph
 with g.as_default():
     saver = tf.train.Saver()
-    
+
 ## training the model
 n_epochs = 500
 training_costs = []
@@ -550,7 +550,7 @@ training_costs = []
 with tf.Session(graph=g) as sess:
     ## first, run the variables initializer
     sess.run(tf.global_variables_initializer())
-    
+
     ## train the model for n_epochs
     for e in range(n_epochs):
         c, _ = sess.run(['cost:0', 'train_op'], 
@@ -559,7 +559,7 @@ with tf.Session(graph=g) as sess:
         training_costs.append(c)
         if not e % 50:
             print('Epoch %4d: %.4f' % (e, c))
-            
+
     saver.save(sess, './trained-model')
 
 
@@ -576,7 +576,7 @@ with tf.Session(graph=g2) as sess:
     new_saver = tf.train.import_meta_graph(
         './trained-model.meta')
     new_saver.restore(sess, './trained-model')
-    
+
     y_pred = sess.run('y_hat:0', 
                       feed_dict={'tf_x:0' : x_test})
 
@@ -595,7 +595,7 @@ with tf.Session(graph=g2) as sess:
     new_saver = tf.train.import_meta_graph(
         './trained-model.meta')
     new_saver.restore(sess, './trained-model')
-    
+
     y_arr = sess.run('y_hat:0', 
                       feed_dict={'tf_x:0' : x_arr})
 
@@ -677,7 +677,7 @@ with g.as_default():
                  dtype=tf.float32, name='t2')
     print(t1)
     print(t2)
-    
+
 with g.as_default():
     t3 = tf.concat([t1, t2], axis=0, name='t3')
     print(t3)
@@ -712,18 +712,20 @@ with g.as_default():
         res = tf.add(tf_x, tf_y, name='result_add')
     else:
         res = tf.subtract(tf_x, tf_y, name='result_sub')
-        
+
     print('Object: ', res)
-        
+
 with tf.Session(graph=g) as sess:
-    print('x < y: %s -> Result:' % (x < y), 
-          res.eval(feed_dict={'tf_x:0': x, 
-                              'tf_y:0': y}))
+    print(
+        f'x < y: {x < y} -> Result:',
+        res.eval(feed_dict={'tf_x:0': x, 'tf_y:0': y}),
+    )
     x, y = 2.0, 1.0
-    print('x < y: %s -> Result:' % (x < y), 
-          res.eval(feed_dict={'tf_x:0': x,
-                              'tf_y:0': y}))  
-    
+    print(
+        f'x < y: {x < y} -> Result:',
+        res.eval(feed_dict={'tf_x:0': x, 'tf_y:0': y}),
+    )  
+
     ## uncomment the next line if you want to visualize the graph in TensorBoard:
     file_writer = tf.summary.FileWriter(logdir='./logs/py-cflow/', graph=g)
 
@@ -747,15 +749,17 @@ with g.as_default():
                   lambda: tf.subtract(tf_x, tf_y, 
                                  name='result_sub'))
     print('Object:', res)
-        
+
 with tf.Session(graph=g) as sess:
-    print('x < y: %s -> Result:' % (x < y), 
-          res.eval(feed_dict={'tf_x:0': x, 
-                              'tf_y:0': y}))
+    print(
+        f'x < y: {x < y} -> Result:',
+        res.eval(feed_dict={'tf_x:0': x, 'tf_y:0': y}),
+    )
     x, y = 2.0, 1.0
-    print('x < y: %s -> Result:' % (x < y), 
-          res.eval(feed_dict={'tf_x:0': x,
-                              'tf_y:0': y}))  
+    print(
+        f'x < y: {x < y} -> Result:',
+        res.eval(feed_dict={'tf_x:0': x, 'tf_y:0': y}),
+    )  
 
     #file_writer = tf.summary.FileWriter(logdir='./logs/tf-cond/', graph=g)
 

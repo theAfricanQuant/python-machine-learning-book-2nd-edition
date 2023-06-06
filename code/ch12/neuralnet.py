@@ -108,23 +108,7 @@ class NeuralNetMLP(object):
 
         term1 = -y_enc * (np.log(output))
         term2 = (1. - y_enc) * np.log(1. - output)
-        cost = np.sum(term1 - term2) + L2_term
-
-        # If you are applying this cost function to other
-        # datasets where activation
-        # values maybe become more extreme (closer to zero or 1)
-        # you may encounter "ZeroDivisionError"s due to numerical
-        # instabilities in Python & NumPy for the current implementation.
-        # I.e., the code tries to evaluate log(0), which is undefined.
-        # To address this issue, you could add a small constant to the
-        # activation values that are passed to the log function.
-        #
-        # For example:
-        #
-        # term1 = -y_enc * (np.log(output + 1e-5))
-        # term2 = (1. - y_enc) * np.log(1. - output + 1e-5)
-
-        return cost
+        return np.sum(term1 - term2) + L2_term
 
     def predict(self, X):
         """Predict class labels
@@ -141,8 +125,7 @@ class NeuralNetMLP(object):
 
         """
         z_h, a_h, z_out, a_out = self._forward(X)
-        y_pred = np.argmax(z_out, axis=1)
-        return y_pred
+        return np.argmax(z_out, axis=1)
 
     def fit(self, X_train, y_train, X_valid, y_valid):
         """ Learn weights from training data.

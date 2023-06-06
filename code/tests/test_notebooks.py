@@ -16,18 +16,19 @@ def run_ipynb(path):
     orig_dir = os.getcwd()
     os.chdir(nb_dir)
 
-    if (sys.version_info >= (3, 0)):
-        kernel_name = 'python3'
-    else:
-        kernel_name = 'python2'
+    kernel_name = 'python3' if (sys.version_info >= (3, 0)) else 'python2'
     #  error_cells = []
 
-    args = ["jupyter", "nbconvert",
-            "--execute", "--inplace",
-            "--debug",
-            "--ExecutePreprocessor.timeout=5000",
-            "--ExecutePreprocessor.kernel_name=%s" % kernel_name,
-            nb_path]
+    args = [
+        "jupyter",
+        "nbconvert",
+        "--execute",
+        "--inplace",
+        "--debug",
+        "--ExecutePreprocessor.timeout=5000",
+        f"--ExecutePreprocessor.kernel_name={kernel_name}",
+        nb_path,
+    ]
 
     if (sys.version_info >= (3, 0)):
         try:
@@ -80,21 +81,19 @@ class TestNotebooks(unittest.TestCase):
                                '../ch07/ch07.ipynb'))
 
     def test_ch08(self):
-        this_dir = os.path.dirname(os.path.abspath(__file__))
-
         # run only on Py3, because of Py2 unicode handling
         if (sys.version_info >= (3, 0)):
+            this_dir = os.path.dirname(os.path.abspath(__file__))
+
             run_ipynb(os.path.join(this_dir,
                                    '../ch08/ch08.ipynb'))
 
     def test_ch09(self):
-        this_dir = os.path.dirname(os.path.abspath(__file__))
-
         # run only on Py3, because of the Py3 specific pickle files
         if (sys.version_info >= (3, 0)):
+            this_dir = os.path.dirname(os.path.abspath(__file__))
+
             run_ipynb(os.path.join(this_dir, '../ch09/ch09.ipynb'))
-        else:
-            pass
 
     def test_ch10(self):
         this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -127,9 +126,9 @@ class TestNotebooks(unittest.TestCase):
                                '../ch15/ch15.ipynb'))
 
     def test_ch16(self):
-        this_dir = os.path.dirname(os.path.abspath(__file__))
         # run only on Py3, because of Py2 unicode handling
         if (sys.version_info >= (3, 0)):
+            this_dir = os.path.dirname(os.path.abspath(__file__))
             run_ipynb(os.path.join(this_dir,
                                    '../ch16/ch16.ipynb'))
 
